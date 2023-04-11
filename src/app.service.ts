@@ -1,11 +1,9 @@
-import { Injectable } from '@nestjs/common';
-const { Configuration, OpenAIApi } = require('openai');
-const dotenv = require('dotenv');
-dotenv.config();
+import { Injectable } from "@nestjs/common";
+const { Configuration, OpenAIApi } = require("openai");
 
 @Injectable()
 export class AppService {
-  async callOpenApi(data: { text: string }) {
+  async handleOpenApi(data: { text: string }) {
     try {
       const configuration = new Configuration({
         apiKey: process.env.OPENAI_API_KEY,
@@ -13,10 +11,10 @@ export class AppService {
       const openai = new OpenAIApi(configuration);
 
       let temp_data = JSON.stringify(data.text);
-      let finalData = temp_data.replace(/[/\])}[{(]/g, '');
+      let finalData = temp_data.replace(/[/\])}[{(]/g, "");
 
       const response = await openai.createCompletion({
-        model: 'text-davinci-003',
+        model: "text-davinci-003",
         prompt: finalData,
         temperature: 0.05,
         max_tokens: 256,
@@ -24,10 +22,9 @@ export class AppService {
         frequency_penalty: 0,
         presence_penalty: 0,
       });
-
       return response.data.choices[0].text;
     } catch (err) {
-      console.log('errrr', err);
+      console.log("errrr", err);
     }
   }
 }

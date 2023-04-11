@@ -1,28 +1,19 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
-import * as argon2 from 'argon2';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { AuthDto } from './dto/auth.dto';
+import { UsersService } from "src/users/users.service";
+import * as argon2 from "argon2";
+import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
+
+import { AuthDto } from "./dto/auth.dto";
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
-    private configService: ConfigService,
-  ) {}
+  constructor(private usersService: UsersService, private jwtService: JwtService, private configService: ConfigService) {}
   async signUp(createUserDto: any): Promise<any> {
     // Check if user exists
-    const userExists = await this.usersService.findByUsername(
-      createUserDto.username,
-    );
+    const userExists = await this.usersService.findByUsername(createUserDto.username);
     if (userExists) {
-      throw new BadRequestException('User already exists');
+      throw new BadRequestException("User already exists");
     }
 
     // Hash password
@@ -39,10 +30,9 @@ export class AuthService {
   async signIn(data: AuthDto) {
     // Check if user exists
     const user = await this.usersService.findByUsername(data.username);
-    if (!user) throw new BadRequestException('User does not exist');
+    if (!user) throw new BadRequestException("User does not exist");
     const passwordMatches = await argon2.verify(user.password, data.password);
-    if (!passwordMatches)
-      throw new BadRequestException('Password is incorrect');
+    if (!passwordMatches) throw new BadRequestException("Password is incorrect");
     const tokens = await this.getTokens(user._id, user.username);
     await this.updateRefreshToken(user._id, tokens.refreshToken);
     return { ...tokens, id: user._id };
@@ -71,9 +61,9 @@ export class AuthService {
           username,
         },
         {
-          secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-          expiresIn: '15m',
-        },
+          secret: this.configService.get<string>("JWT_ACCESS_SECRET"),
+          expiresIn: "15m",
+        }
       ),
       this.jwtService.signAsync(
         {
@@ -81,9 +71,9 @@ export class AuthService {
           username,
         },
         {
-          secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-          expiresIn: '7d',
-        },
+          secret: this.configService.get<string>("JWT_REFRESH_SECRET"),
+          expiresIn: "7d",
+        }
       ),
     ]);
 
@@ -95,13 +85,9 @@ export class AuthService {
 
   async refreshTokens(userId: string, refreshToken: string) {
     const user = await this.usersService.findById(userId);
-    if (!user || !user.refreshToken)
-      throw new ForbiddenException('Access Denied');
-    const refreshTokenMatches = await argon2.verify(
-      user.refreshToken,
-      refreshToken,
-    );
-    if (!refreshTokenMatches) throw new ForbiddenException('Access Denied');
+    if (!user || !user.refreshToken) throw new ForbiddenException("Access Denied");
+    const refreshTokenMatches = await argon2.verify(user.refreshToken, refreshToken);
+    if (!refreshTokenMatches) throw new ForbiddenException("Access Denied");
     const tokens = await this.getTokens(user.id, user.username);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
     return tokens;
