@@ -10,7 +10,7 @@ import { AuthDto } from "./dto/auth.dto";
 export class AuthService {
   constructor(private usersService: UsersService, private jwtService: JwtService, private configService: ConfigService) {}
   async signUp(createUserDto: any): Promise<any> {
-    // Check if user exists
+    // Checking if user exists
     const userExists = await this.usersService.findByUsername(createUserDto.username);
     if (userExists) {
       throw new BadRequestException("User already exists");

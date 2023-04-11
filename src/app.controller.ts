@@ -10,7 +10,7 @@ export class AppController {
   @HttpCode(200)
   async handleOpenApi(@Body() data: { text: string; id: string }) {
     try {
-      // Call the OpenAI API here
+      // fetching the result from open-api
       const result = await this.appService.handleOpenApi(data);
       if (data.id) {
         const user = await this.usersService.findById(data.id);
