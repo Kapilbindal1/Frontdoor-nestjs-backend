@@ -1,10 +1,10 @@
 import { UsersService } from "src/users/users.service";
 import { Controller, Post, Body, HttpCode } from "@nestjs/common";
 import { AppService } from "./app.service";
-import { ChatHistoryService } from "./chat-history/chat-history.service";
+import { HighlightHistoryService } from "./highlight-history/highlight-history.service";
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService, private usersService: UsersService, private chatHistoryService: ChatHistoryService) {}
+  constructor(private readonly appService: AppService, private usersService: UsersService, private HighlightHistoryService: HighlightHistoryService) {}
 
   @Post("/openai")
   @HttpCode(200)
@@ -15,10 +15,10 @@ export class AppController {
       if (data.id) {
         const user = await this.usersService.findById(data.id);
         if (user) {
-          await this.chatHistoryService.create({
+          await this.HighlightHistoryService.create({
             userId: user._id,
-            text: data.text,
-            reply: result,
+            userText: data.text,
+            textResponse: result,
           });
         }
         console.log(user, "useruser");

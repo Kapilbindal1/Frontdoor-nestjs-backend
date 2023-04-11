@@ -13,13 +13,13 @@ export class AuthController {
   constructor(private authService: AuthService, private usersService: UsersService) {}
 
   //signup api
-  @Post("signup")
+  @Post("sign-up")
   signup(@Body() createUserDto: CreateUserDto) {
     return this.authService.signUp(createUserDto);
   }
 
   //signin api
-  @Post("signin")
+  @Post("sign-in")
   signin(@Body() data: AuthDto) {
     return this.authService.signIn(data);
   }
